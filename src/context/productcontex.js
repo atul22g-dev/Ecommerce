@@ -4,7 +4,7 @@ import reducer from "../reducer/productReducer";
 
 const AppContext = createContext();
 
-const API = "https://atugatranapi.pages.dev/Products/index.json";
+const API = "https://atualapis.pages.dev/Products/index.json";
 
 const initialState = {
   isLoading: false,
