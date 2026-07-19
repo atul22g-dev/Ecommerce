@@ -4,7 +4,8 @@ import reducer from "../reducer/productReducer";
 
 const AppContext = createContext();
 
-const API = "https://atualapis.pages.dev/Products/index.json";
+const API = process.env.REACT_APP_ProductAPI;
+const token = process.env.REACT_APP_ProductkeyToken;
 
 const initialState = {
   isLoading: false,
@@ -15,13 +16,23 @@ const initialState = {
   singleProduct: {},
 };
 
+console.log("====================================");
+console.log(API);
+console.log(token);
+console.log("====================================");
+
+
 const AppProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const getProducts = async (url) => {
     dispatch({ type: "SET_LOADING" });
     try {
-      const res = await axios.get(url);
+      const res = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
       const products = await res.data;
       dispatch({ type: "SET_API_DATA", payload: products });
     } catch (error) {
@@ -36,7 +47,11 @@ const AppProvider = ({ children }) => {
     dispatch({ type: "SET_SINGLE_LOADING" });
     var Single;
     try {
-      const res = await axios.get(API);
+      const res = await axios.get(API, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
       const singleProducts = await res.data;
       // eslint-disable-next-line array-callback-return
       singleProducts.map((item) => {
