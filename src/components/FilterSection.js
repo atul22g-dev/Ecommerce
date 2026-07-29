@@ -4,6 +4,20 @@ import { FaCheck } from "react-icons/fa";
 import FormatPrice from "../Helpers/FormatPrice";
 import { Button } from "../styles/Button";
 
+// get the unique values of each property
+const getUniqueData = (data, attr) => {
+  let newVal = data.map((curElem) => {
+    return curElem[attr];
+  });
+
+  if (attr === "colors") {
+    // return (newVal = ["All", ...new Set([].concat(...newVal))]);
+    newVal = newVal.flat();
+  }
+
+  return (newVal = ["all", ...new Set(newVal)]);
+};
+
 const FilterSection = () => {
   const {
     filters: { text, category, color, price, maxPrice, minPrice },
@@ -12,28 +26,10 @@ const FilterSection = () => {
     clearFilters,
   } = useFilterContext();
 
-  // get the unique values of each property
-  const getUniqueData = (data, attr) => {
-    let newVal = data.map((curElem) => {
-      return curElem[attr];
-    });
-
-    if (attr === "colors") {
-      // return (newVal = ["All", ...new Set([].concat(...newVal))]);
-      newVal = newVal.flat();
-    }
-
-    return (newVal = ["all", ...new Set(newVal)]);
-  };
-
   // we need to have the individual data of each in an array format
   const categoryData = getUniqueData(all_products, "category");
   const companyData = getUniqueData(all_products, "company");
   const colorsData = getUniqueData(all_products, "colors");
-  // console.log(
-  //   "🚀 ~ file: FilterSection.js ~ line 23 ~ FilterSection ~ companyData",
-  //   colorsData
-  // );
 
   return (
     <Wrapper>
@@ -43,6 +39,7 @@ const FilterSection = () => {
             type="text"
             name="text"
             placeholder="Search"
+            aria-label="Search products"
             value={text}
             onChange={updateFilterValue}
           />
@@ -55,12 +52,13 @@ const FilterSection = () => {
           {categoryData.map((curElem, index) => {
             return (
               <button
-                key={index}
+                key={curElem}
                 type="button"
                 name="category"
                 value={curElem}
                 className={curElem === category ? "active" : ""}
-                onClick={updateFilterValue}>
+                onClick={updateFilterValue}
+                aria-label={`Filter by category: ${curElem}`}>
                 {curElem}
               </button>
             );
@@ -76,10 +74,11 @@ const FilterSection = () => {
             name="company"
             id="company"
             className="filter-company--select"
-            onClick={updateFilterValue}>
+            onClick={updateFilterValue}
+            aria-label="Filter by company">
             {companyData.map((curElem, index) => {
               return (
-                <option key={index} value={curElem} name="company">
+                <option key={curElem} value={curElem} name="company">
                   {curElem}
                 </option>
               );
@@ -96,25 +95,27 @@ const FilterSection = () => {
             if (curColor === "all") {
               return (
                 <button
-                  key={index}
+                  key={curColor}
                   type="button"
                   value={curColor}
                   name="color"
                   className="color-all--style"
-                  onClick={updateFilterValue}>
+                  onClick={updateFilterValue}
+                  aria-label="Show all colors">
                   all
                 </button>
               );
             }
             return (
               <button
-                key={index}
+                key={curColor}
                 type="button"
                 value={curColor}
                 name="color"
                 style={{ backgroundColor: curColor }}
                 className={color === curColor ? "btnStyle active" : "btnStyle"}
-                onClick={updateFilterValue}>
+                onClick={updateFilterValue}
+                aria-label={`Filter by color: ${curColor}`}>
                 {color === curColor ? <FaCheck className="checkStyle" /> : null}
               </button>
             );
@@ -134,6 +135,7 @@ const FilterSection = () => {
           max={maxPrice}
           value={price}
           onChange={updateFilterValue}
+          aria-label="Filter by price"
         />
       </div>
 

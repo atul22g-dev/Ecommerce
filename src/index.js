@@ -7,23 +7,28 @@ import { AppProvider } from "./context/productcontex";
 import { FilterContextProvider } from "./context/filter_context";
 import { CartProvider } from "./context/cart_context";
 import { Auth0Provider } from "@auth0/auth0-react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <Auth0Provider
-    domain={process.env.REACT_APP_AUTH_DOMAN}
-    clientId={process.env.REACT_APP_CLINT_ID}
-    redirectUri={window.location.origin}
-  >
-    <AppProvider>
-      <FilterContextProvider>
-        <CartProvider>
-          <App />
-        </CartProvider>
-      </FilterContextProvider>
-    </AppProvider>
-  </Auth0Provider>
+  <QueryClientProvider client={queryClient}>
+    <Auth0Provider
+      domain={process.env.REACT_APP_AUTH_DOMAN}
+      clientId={process.env.REACT_APP_CLINT_ID}
+      redirectUri={window.location.origin}
+    >
+      <AppProvider>
+        <FilterContextProvider>
+          <CartProvider>
+            <App />
+          </CartProvider>
+        </FilterContextProvider>
+      </AppProvider>
+    </Auth0Provider>
+  </QueryClientProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

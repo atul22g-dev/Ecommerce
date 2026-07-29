@@ -1,11 +1,12 @@
-import { createContext, useContext, useEffect, useReducer } from "react";
+import { createContext, useContext, useEffect, useReducer, useMemo, useCallback } from "react";
 import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 import reducer from "../reducer/productReducer";
 
 const AppContext = createContext();
 
 const API = process.env.REACT_APP_ProductAPI;
-const token = process.env.REACT_APP_ProductkeyToken;
+const token = process.env.REACT_APP_ProductAuth;
 
 const initialState = {
   isLoading: false,
@@ -16,34 +17,35 @@ const initialState = {
   singleProduct: {},
 };
 
-console.log("====================================");
-console.log(API);
-console.log(token);
-console.log("====================================");
-
-
 const AppProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const getProducts = async (url) => {
-    dispatch({ type: "SET_LOADING" });
-    try {
-      const res = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        }
-      });
-      const products = await res.data;
-      dispatch({ type: "SET_API_DATA", payload: products });
-    } catch (error) {
+  // Fetch products with useQuery — handles caching, deduplication,
+  // race conditions, retries, and refetch-on-focus automatically
+  const queryResult = useQuery({
+    queryKey: ["products"],
+    queryFn: () =>
+      axios
+        .get(API, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => res.data),
+  });
+
+  // Sync useQuery state to the reducer for backward compatibility
+  useEffect(() => {
+    if (queryResult.isLoading) {
+      dispatch({ type: "SET_LOADING" });
+    } else if (queryResult.data) {
+      dispatch({ type: "SET_API_DATA", payload: queryResult.data });
+    } else if (queryResult.isError) {
       dispatch({ type: "API_ERROR" });
     }
-  };
+  }, [queryResult.isLoading, queryResult.data, queryResult.isError]);
 
   // my 2nd api call for single product
 
-  const getSingleProduct = async (query) => {
-    // console.log(query);
+  const getSingleProduct = useCallback(async (query) => {
     dispatch({ type: "SET_SINGLE_LOADING" });
     var Single;
     try {
@@ -66,14 +68,15 @@ const AppProvider = ({ children }) => {
     } catch (error) {
       dispatch({ type: "SET_SINGLE_ERROR" });
     }
-  };
-
-  useEffect(() => {
-    getProducts(API);
   }, []);
 
+  const contextValue = useMemo(
+    () => ({ ...state, getSingleProduct }),
+    [state, getSingleProduct]
+  );
+
   return (
-    <AppContext.Provider value={{ ...state, getSingleProduct }}>
+    <AppContext.Provider value={contextValue}>
       {children}
     </AppContext.Provider>
   );

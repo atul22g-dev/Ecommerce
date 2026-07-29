@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useEffect } from "react";
+import { createContext, useContext, useReducer, useEffect, useMemo, useCallback } from "react";
 import { useProductContext } from "./productcontex";
 import reducer from "../reducer/filterReducer";
 
@@ -26,33 +26,33 @@ export const FilterContextProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   // to set the grid view
-  const setGridView = () => {
+  const setGridView = useCallback(() => {
     return dispatch({ type: "SET_GRID_VIEW" });
-  };
+  }, []);
 
   // to set the list view
-  const setListView = () => {
+  const setListView = useCallback(() => {
     return dispatch({ type: "SET_LIST_VIEW" });
-  };
+  }, []);
 
   // sorting function
-  const sorting = (event) => {
+  const sorting = useCallback((event) => {
     let userValue = event.target.value;
     dispatch({ type: "GET_SORT_VALUE", payload: userValue });
-  };
+  }, []);
 
   // update the filter values
-  const updateFilterValue = (event) => {
+  const updateFilterValue = useCallback((event) => {
     let name = event.target.name;
     let value = event.target.value;
 
     return dispatch({ type: "UPDATE_FILTERS_VALUE", payload: { name, value } });
-  };
+  }, []);
 
   // to clear the filter
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     dispatch({ type: "CLEAR_FILTERS" });
-  };
+  }, []);
 
   // to sort the product
   useEffect(() => {
@@ -65,16 +65,20 @@ export const FilterContextProvider = ({ children }) => {
     dispatch({ type: "LOAD_FILTER_PRODUCTS", payload: products });
   }, [products]);
 
+  const contextValue = useMemo(
+    () => ({
+      ...state,
+      setGridView,
+      setListView,
+      sorting,
+      updateFilterValue,
+      clearFilters,
+    }),
+    [state, setGridView, setListView, sorting, updateFilterValue, clearFilters]
+  );
+
   return (
-    <FilterContext.Provider
-      value={{
-        ...state,
-        setGridView,
-        setListView,
-        sorting,
-        updateFilterValue,
-        clearFilters,
-      }}>
+    <FilterContext.Provider value={contextValue}>
       {children}
     </FilterContext.Provider>
   );

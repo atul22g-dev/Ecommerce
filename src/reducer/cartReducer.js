@@ -38,7 +38,6 @@ const cartReducer = (state, action) => {
         price: product.price,
         max: product.stock,
       };
-      console.log(product.images[0].url);
 
       return {
         ...state,

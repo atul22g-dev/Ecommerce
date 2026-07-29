@@ -1,10 +1,12 @@
-import { createContext, useContext, useReducer, useEffect } from "react";
+import { createContext, useContext, useReducer, useEffect, useMemo, useCallback } from "react";
 import reducer from "../reducer/cartReducer";
+
+const CART_STORAGE_KEY = "ProductCart:v1";
 
 const CartContext = createContext();
 
 const getLocalCartData = () => {
-  let localCartData = localStorage.getItem("ProductCart");
+  let localCartData = localStorage.getItem(CART_STORAGE_KEY);
   if (localCartData === "null") {
     return [];
   } else {
@@ -23,29 +25,29 @@ const initialState = {
 const CartProvider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const addToCart = (id, color, amount, product) => {
+  const addToCart = useCallback((id, color, amount, product) => {
     dispatch({ type: "ADD_TO_CART", payload: { id, color, amount, product } });
-  };
+  }, []);
 
   // increment and decrement the product
 
-  const setDecrease = (id) => {
+  const setDecrease = useCallback((id) => {
     dispatch({ type: "SET_DECREMENT", payload: id });
-  };
+  }, []);
 
-  const setIncrement = (id) => {
+  const setIncrement = useCallback((id) => {
     dispatch({ type: "SET_INCREMENT", payload: id });
-  };
+  }, []);
 
   // to remove the individual item from cart
-  const removeItem = (id) => {
+  const removeItem = useCallback((id) => {
     dispatch({ type: "REMOVE_ITEM", payload: id });
-  };
+  }, []);
 
   // to clear the cart
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     dispatch({ type: "CLEAR_CART" });
-  };
+  }, []);
 
   // to add the data in localStorage
   // get vs set
@@ -55,19 +57,23 @@ const CartProvider = ({ children }) => {
     // dispatch({ type: "CART_TOTAL_PRICE" });
     dispatch({ type: "CART_ITEM_PRICE_TOTAL" });
 
-    localStorage.setItem("ProductCart", JSON.stringify(state.cart));
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(state.cart));
   }, [state.cart]);
 
+  const contextValue = useMemo(
+    () => ({
+      ...state,
+      addToCart,
+      removeItem,
+      clearCart,
+      setDecrease,
+      setIncrement,
+    }),
+    [state, addToCart, removeItem, clearCart, setDecrease, setIncrement]
+  );
+
   return (
-    <CartContext.Provider
-      value={{
-        ...state,
-        addToCart,
-        removeItem,
-        clearCart,
-        setDecrease,
-        setIncrement,
-      }}>
+    <CartContext.Provider value={contextValue}>
       {children}
     </CartContext.Provider>
   );

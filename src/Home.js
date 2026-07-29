@@ -3,12 +3,12 @@ import HeroSection from "./components/HeroSection";
 import Services from "./components/Services";
 import Trusted from "./components/Trusted";
 
+const data = {
+  name: "Atul store",
+};
+
 const Home = () => {
 document.title = "Ecommerce | Home"
-
-  const data = {
-    name: "Atul store",
-  };
 
   return (
     <>

@@ -51,6 +51,7 @@ const Contact = () => {
         allowFullScreen=""
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
+        sandbox=""
       ></iframe>
 
       <div className="container">
@@ -64,6 +65,7 @@ const Contact = () => {
               required
               readOnly
               autoComplete="off"
+              aria-label="Username"
             />
 
             <input
@@ -74,6 +76,7 @@ const Contact = () => {
               autoComplete="off"
               readOnly
               required
+              aria-label="Email"
             />
 
             <textarea

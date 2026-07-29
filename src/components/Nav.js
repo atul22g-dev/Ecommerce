@@ -208,21 +208,41 @@ const Nav = () => {
           </li>
           {isAuthenticated ? (
             <li>
-              <img
+              <button
+                type="button"
                 onClick={() => logout({ returnTo: window.location.origin })}
-                src={user.picture}
-                alt={user.name}
-                className="profile--img"
-              />
+                aria-label={`Log out ${user.name}`}
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                }}>
+                <img
+                  src={user.picture}
+                  alt={user.name}
+                  className="profile--img"
+                />
+              </button>
             </li>
           ) : (
             <li>
-              <img
+              <button
+                type="button"
                 onClick={() => loginWithRedirect()}
-                src="./images/guest.jpg"
-                alt="guest"
-                className="profile--img"
-              />
+                aria-label="Log in"
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                }}>
+                <img
+                  src="./images/guest.jpg"
+                  alt="guest"
+                  className="profile--img"
+                />
+              </button>
             </li>
           )}
         </ul>

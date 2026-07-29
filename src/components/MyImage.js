@@ -9,14 +9,23 @@ const MyImage = ({ imgs = [{ url: "" }] }) => {
       <div className="grid grid-four-column">
         {imgs.map((curElm, index) => {
           return (
-            <figure>
-              <img
-                src={curElm.url}
-                alt={curElm.filename}
-                className="box-image--style"
-                key={index}
+            <figure key={index}>
+              <button
+                type="button"
                 onClick={() => setMainImage(curElm)}
-              />
+                aria-label={`View ${curElm.filename}`}
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: 0,
+                  cursor: "pointer",
+                }}>
+                <img
+                  src={curElm.url}
+                  alt={curElm.filename}
+                  className="box-image--style"
+                />
+              </button>
             </figure>
           );
         })}

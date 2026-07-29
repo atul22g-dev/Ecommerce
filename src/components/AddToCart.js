@@ -15,11 +15,11 @@ const AddToCart = ({ product }) => {
   const [amount, setAmount] = useState(1);
 
   const setDecrease = () => {
-    amount > 1 ? setAmount(amount - 1) : setAmount(1);
+    setAmount((prev) => (prev > 1 ? prev - 1 : 1));
   };
 
   const setIncrease = () => {
-    amount < stock ? setAmount(amount + 1) : setAmount(stock);
+    setAmount((prev) => (prev < stock ? prev + 1 : stock));
   };
 
   return (
@@ -30,10 +30,12 @@ const AddToCart = ({ product }) => {
           {colors.map((curColor, index) => {
             return (
               <button
-                key={index}
+                key={curColor}
+                type="button"
                 style={{ backgroundColor: curColor }}
                 className={color === curColor ? "btnStyle active" : "btnStyle"}
-                onClick={() => setColor(curColor)}>
+                onClick={() => setColor(curColor)}
+                aria-label={`Select color: ${curColor}`}>
                 {color === curColor ? <FaCheck className="checkStyle" /> : null}
               </button>
             );
